@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcipedia - Infinite Knowledge Feed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                maxWidth: 'none',
+                                color: 'inherit',
+                                a: {
+                                    color: 'inherit',
+                                    textDecoration: 'underline',
+                                    fontWeight: '500'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Arcipedia
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="search.html" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </a>
+                    <button id="darkModeToggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Category Chips -->
+    <div class="sticky top-16 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex space-x-2 overflow-x-auto">
+                <a href="index.html?category=random" class="category-chip px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white whitespace-nowrap">
+                    Random
+                </a>
+                <a href="index.html?category=technology" class="category-chip px-4 py-2 rounded-full text-sm font-medium bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 whitespace-nowrap">
+                    Technology
+                </a>
+                <a href="index.html?category=history" class="category-chip px-4 py-2 rounded-full text-sm font-medium bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 whitespace-nowrap">
+                    History
+                </a>
+                <a href="index.html?category=science" class="category-chip px-4 py-2 rounded-full text-sm font-medium bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 whitespace-nowrap">
+                    Science
+                </a>
+                <a href="index.html?category=art" class="category-chip px-4 py-2 rounded-full text-sm font-medium bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 whitespace-nowrap">
+                    Art
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Feed Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="feedContainer" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <!-- Articles will be dynamically inserted here -->
+        </div>
+        
+        <!-- Loading Sentinel -->
+        <div id="loadingSentinel" class="py-8 text-center hidden">
+            <div class="inline-flex items-center space-x-2">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span class="text-sm text-slate-600 dark:text-slate-400">Loading more articles...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center text-slate-600 dark:text-slate-400">
+                <p>&copy; 2024 Arcipedia. Powered by Wikipedia API.</p>
+                <p class="mt-2 text-sm">Discover knowledge, one article at a time.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Debug Info -->
+    <div class="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs max-w-xs">
+        <div id="debugInfo">Initializing...</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/simple-test.js"></script>
+    <script>
+        // Simple debug version
+        console.log('=== Starting Debug Version ===');
+        
+        const debugEl = document.getElementById('debugInfo');
+        
+        function updateDebug(message) {
+            console.log(message);
+            if (debugEl) debugEl.textContent = message;
+        }
+        
+        async function loadArticles() {
+            try {
+                updateDebug('Loading articles...');
+                
+                if (typeof wikiAPI === 'undefined') {
+                    updateDebug('ERROR: wikiAPI not loaded');
+                    return;
+                }
+                
+                const articles = await wikiAPI.fetchRandomArticles(6);
+                updateDebug(`Loaded ${articles.length} articles`);
+                
+                const container = document.getElementById('feedContainer');
+                if (container && articles.length > 0) {
+                    container.innerHTML = articles.map(article => {
+                        const cleanTitle = (article.title || '').trim();
+                        const encodedTitle = encodeURIComponent(cleanTitle);
+                        const articleUrl = `article.html?title=${encodedTitle}`;
+                        const wikiUrl = `https://en.wikipedia.org/wiki/${cleanTitle.replace(/ /g, '_')}`;
+                        
+                        return `
+                            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer" onclick="window.location.href='${articleUrl}'">
+                                <div class="aspect-video overflow-hidden bg-slate-100 dark:bg-slate-700">
+                                    <img src="${article.thumbnail || 'https://via.placeholder.com/400x300/1e293b/64748b?text=No+Image'}" alt="${cleanTitle}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                        ${cleanTitle}
+                                    </h3>
+                                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed line-clamp-3">
+                                        ${article.extract || 'No description available.'}
+                                    </p>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <a href="${wikiUrl}" target="_blank" class="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300" onclick="event.stopPropagation()">
+                                            View on Wikipedia →
+                                        </a>
+                                        <svg class="w-4 h-4 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    updateDebug('Articles rendered successfully');
+                } else {
+                    updateDebug('No articles found');
+                }
+            } catch (error) {
+                updateDebug('ERROR: ' + error.message);
+                console.error('Error loading articles:', error);
+            }
+        }
+        
+        // Initialize dark mode
+        if (typeof window.ArcipediaUtils !== 'undefined') {
+            window.ArcipediaUtils.initDarkMode();
+            updateDebug('Dark mode initialized');
+        }
+        
+        // Load articles
+        loadArticles();
+        
+        // Setup dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                updateDebug('Dark mode toggled');
+            });
+        }
+    </script>
+</body>
+</html>

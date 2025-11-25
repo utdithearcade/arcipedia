@@ -6,7 +6,7 @@ class ComponentRenderer {
         const imageUrl = article.thumbnail || 'https://via.placeholder.com/400x300/1e293b/64748b?text=No+Image';
         
         return `
-            <article class="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer" data-article-id="${article.id}">
+            <article class="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer" onclick="window.location.href='${article.articleUrl}'">
                 <div class="aspect-video overflow-hidden bg-slate-100 dark:bg-slate-700">
                     <img 
                         src="${imageUrl}" 
@@ -37,10 +37,14 @@ class ComponentRenderer {
 
     // Search result template
     static searchResult(result) {
+        const cleanTitle = (result.title || '').trim();
+        const encodedTitle = encodeURIComponent(cleanTitle);
+        const articleUrl = `article.html?title=${encodedTitle}`;
+        
         return `
-            <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer rounded-lg transition-colors search-result-item" data-title="${result.title}">
+            <div class="p-4 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer rounded-lg transition-colors search-result-item" onclick="window.location.href='${articleUrl}'">
                 <h4 class="font-medium text-slate-900 dark:text-slate-100 mb-2">
-                    ${result.title}
+                    ${cleanTitle}
                 </h4>
                 <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
                     ${result.description || 'No description available.'}
@@ -123,7 +127,12 @@ class ComponentRenderer {
     // Render multiple article cards
     static renderArticles(articles, containerId = 'feedContainer') {
         const container = document.getElementById(containerId);
-        if (!container) return;
+        if (!container) {
+            console.error(`Container ${containerId} not found`);
+            return;
+        }
+
+        console.log(`Rendering ${articles.length} articles in container ${containerId}`);
 
         if (articles.length === 0) {
             container.innerHTML = this.emptyFeed();
@@ -132,6 +141,7 @@ class ComponentRenderer {
 
         const articlesHTML = articles.map(article => this.articleCard(article)).join('');
         container.innerHTML = articlesHTML;
+        console.log('Articles rendered successfully');
     }
 
     // Append articles to existing container

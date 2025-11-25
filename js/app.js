@@ -11,6 +11,12 @@ class ArcipediaApp {
     }
 
     init() {
+        // Wait for all scripts to load
+        if (typeof window.ArcipediaUtils === 'undefined') {
+            console.error('ArcipediaUtils not loaded');
+            return;
+        }
+        
         // Initialize utilities
         window.ArcipediaUtils.initDarkMode();
         
@@ -137,6 +143,12 @@ class ArcipediaApp {
     }
 
     async loadInitialArticles() {
+        if (typeof window.ComponentRenderer === 'undefined' || typeof wikiAPI === 'undefined') {
+            console.error('Required components not loaded');
+            window.ArcipediaUtils.showError('Application components not loaded. Please refresh the page.');
+            return;
+        }
+        
         this.isLoading = true;
         window.ComponentRenderer.showLoadingSkeletons();
 

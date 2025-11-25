@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcipedia - Infinite Knowledge Feed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                maxWidth: 'none',
+                                color: 'inherit',
+                                a: {
+                                    color: 'inherit',
+                                    textDecoration: 'underline',
+                                    fontWeight: '500'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 min-h-screen">
+    <!-- Header will be injected by JavaScript -->
+    <div id="header"></div>
+
+    <!-- Category Chips will be injected by JavaScript -->
+    <div id="categoryChips"></div>
+
+    <!-- Main Feed Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="feedContainer" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <!-- Articles will be dynamically inserted here -->
+        </div>
+        
+        <!-- Loading Sentinel -->
+        <div id="loadingSentinel" class="py-8 text-center hidden">
+            <div class="inline-flex items-center space-x-2">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span class="text-sm text-slate-600 dark:text-slate-400">Loading more articles...</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be injected by JavaScript -->
+    <div id="footer"></div>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../components/shared.js"></script>
+    <script src="../js/simple-test.js"></script>
+    <script>
+        // Initialize app when everything is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing HomePage...');
+            new HomePage();
+        });
+    </script>
+    <script src="home.js"></script>
+</body>
+</html>
