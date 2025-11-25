@@ -18,10 +18,9 @@ function sanitizeHTML(html) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = html;
 
-    // Remove unwanted elements
+    // Remove unwanted elements (keep image containers like infobox/thumb/gallery)
     const unwantedSelectors = [
         '.mw-editsection',
-        '.infobox',
         '.reference',
         '.navbox',
         '.metadata',
@@ -30,15 +29,42 @@ function sanitizeHTML(html) {
         '.rellink',
         '.reflist',
         '.toc',
-        '.thumb',
-        '.gallery',
-        'table',
         'sup.reference'
     ];
 
     unwantedSelectors.forEach(selector => {
         const elements = tempDiv.querySelectorAll(selector);
         elements.forEach(el => el.remove());
+    });
+
+    // Normalize image sources so they work from file:// and http:// origins
+    const WIKI_BASE = 'https://en.wikipedia.org';
+
+    const images = tempDiv.querySelectorAll('img');
+    images.forEach(img => {
+        const src = img.getAttribute('src');
+        if (!src) return;
+
+        if (src.startsWith('//')) {
+            // Protocol-relative -> force https
+            img.src = 'https:' + src;
+        } else if (src.startsWith('/')) {
+            // Root-relative to Wikipedia
+            img.src = WIKI_BASE + src;
+        }
+    });
+
+    // Normalize links as well (e.g. /wiki/File:..., //upload.wikimedia.org/...)
+    const links = tempDiv.querySelectorAll('a');
+    links.forEach(a => {
+        const href = a.getAttribute('href');
+        if (!href) return;
+
+        if (href.startsWith('//')) {
+            a.href = 'https:' + href;
+        } else if (href.startsWith('/')) {
+            a.href = WIKI_BASE + href;
+        }
     });
 
     return tempDiv.innerHTML;

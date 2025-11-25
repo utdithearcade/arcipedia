@@ -7,33 +7,79 @@ class WikipediaAPI {
     }
 
     async fetchRandomArticles(count = 10) {
-        // Use list=random instead of generator=random for better results
-        const params = new URLSearchParams({
-            action: 'query',
-            format: 'json',
-            list: 'random',
-            rnnamespace: '0', // Main namespace only
-            rnlimit: count,
-            origin: this.origin
-        });
-
         try {
-            // First get random page IDs
+            // First try real random articles
+            const params = new URLSearchParams({
+                action: 'query',
+                format: 'json',
+                list: 'random',
+                rnnamespace: '0',
+                rnlimit: count,
+                origin: this.origin
+            });
+
             const response = await fetch(`${API_BASE_URL}?${params}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
             
             if (!data.query || !data.query.random) {
-                return [];
+                throw new Error('No random articles found');
             }
 
-            // Extract page IDs and get page details
+            // Get page details
             const pageIds = data.query.random.map(page => page.id).join('|');
-            return await this.fetchArticlesByIds(pageIds);
+            const articles = await this.fetchArticlesByIds(pageIds, count);
+            
+            // If we got some articles, return them
+            if (articles.length > 0) {
+                return articles;
+            }
+            
+            // Fallback to famous articles
+            console.log('Random articles returned no results, using fallback articles');
+            return await this.getFallbackArticles(count);
+            
         } catch (error) {
             console.error('Error fetching random articles:', error);
-            throw error;
+            // Fallback to famous articles
+            return await this.getFallbackArticles(count);
         }
+    }
+
+    async getFallbackArticles(count = 10) {
+        const famousArticles = [
+            'Albert Einstein', 'Leonardo da Vinci', 'Marie Curie', 'Isaac Newton', 'Nelson Mandela',
+            'William Shakespeare', 'Albert Einstein', 'Leonardo da Vinci', 'Marie Curie', 'Isaac Newton'
+        ];
+        
+        const articles = [];
+        const selectedArticles = famousArticles.slice(0, count);
+        
+        for (const title of selectedArticles) {
+            try {
+                const response = await fetch(`${API_BASE_URL}?action=query&format=json&titles=${encodeURIComponent(title)}&prop=pageimages|extracts&piprop=thumbnail&pithumbsize=400&exintro=true&explaintext=true&exchars=200&origin=${this.origin}`);
+                const data = await response.json();
+                
+                const pages = data.query.pages;
+                const page = Object.values(pages)[0];
+                
+                if (page && !page.missing) {
+                    articles.push({
+                        id: page.pageid,
+                        title: page.title,
+                        extract: page.extract || 'No description available.',
+                        thumbnail: page.thumbnail?.source || null,
+                        originalImage: page.original?.source || null,
+                        url: `https://en.wikipedia.org/wiki/${page.title.replace(/ /g, '_')}`,
+                        articleUrl: `article.html?title=${encodeURIComponent(page.title)}`
+                    });
+                }
+            } catch (error) {
+                console.log(`Failed to fetch fallback article ${title}:`, error);
+            }
+        }
+        
+        return articles;
     }
 
     async fetchCategoryArticles(category, count = 10) {
@@ -75,18 +121,19 @@ class WikipediaAPI {
         }
     }
 
-    async fetchArticlesByIds(pageIds) {
+    async fetchArticlesByIds(pageIds, targetCount = 10) {
         const params = new URLSearchParams({
             action: 'query',
             format: 'json',
             pageids: pageIds,
             prop: 'pageimages|extracts',
-            piprop: 'thumbnail|original',
+            piprop: 'thumbnail',
             pithumbsize: '400',
             pilicense: 'any',
+            urlwidth: '400',
             exintro: 'true',
             explaintext: 'true',
-            exchars: '500', // Use exchars instead of exsentences (more reliable)
+            exchars: '500',
             origin: this.origin
         });
 
@@ -94,7 +141,19 @@ class WikipediaAPI {
             const response = await fetch(`${API_BASE_URL}?${params}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
-            return this.parseRandomArticles(data);
+            
+            const articles = this.parseRandomArticles(data);
+            
+            // Prioritize articles with images, but include others if needed
+            const withImages = articles.filter(article => article.thumbnail);
+            const withoutImages = articles.filter(article => !article.thumbnail);
+            
+            console.log(`Found ${withImages.length} articles with images, ${withoutImages.length} without`);
+            
+            // Return articles with images first, then fill with others if needed
+            const result = [...withImages, ...withoutImages].slice(0, targetCount);
+            
+            return result;
         } catch (error) {
             console.error('Error fetching articles by IDs:', error);
             throw error;
@@ -169,11 +228,21 @@ class WikipediaAPI {
                 const encodedTitle = encodeURIComponent(cleanTitle);
                 const wikiTitle = cleanTitle.replace(/ /g, '_');
                 
+                // Handle thumbnail URL properly
+                let thumbnailUrl = null;
+                if (page.thumbnail && page.thumbnail.source) {
+                    // Ensure HTTPS and proper domain
+                    thumbnailUrl = page.thumbnail.source.replace(/^http:\/\//, 'https://');
+                    console.log(`Thumbnail for ${cleanTitle}:`, thumbnailUrl);
+                } else {
+                    console.log(`No thumbnail found for ${cleanTitle}`);
+                }
+                
                 return {
                     id: page.pageid,
                     title: cleanTitle,
                     extract: (page.extract || '').trim() || 'No description available.',
-                    thumbnail: page.thumbnail?.source || null,
+                    thumbnail: thumbnailUrl,
                     originalImage: page.original?.source || null,
                     url: `https://en.wikipedia.org/wiki/${wikiTitle}`,
                     articleUrl: `article.html?title=${encodedTitle}`
