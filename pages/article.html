@@ -27,6 +27,118 @@
             }
         }
     </script>
+    <style>
+        /* Wikipedia-like article layout with modern styling */
+        .wiki-article {
+            max-width: 64rem; /* similar to Wikipedia content width */
+            line-height: 1.8;
+        }
+
+        .wiki-article img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Modernized infobox / thumb card on the right */
+        .wiki-article .infobox,
+        .wiki-article .thumb {
+            float: right;
+            clear: right;
+            margin: 0 0 1.5rem 1.5rem;
+            background: radial-gradient(circle at top left, #e0f2fe, #f8fafc);
+            border-radius: 0.9rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+            overflow: hidden;
+        }
+
+        .dark .wiki-article .infobox,
+        .dark .wiki-article .thumb {
+            background: radial-gradient(circle at top left, #1e293b, #020617);
+            border-color: #1f2933;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.6);
+        }
+
+        .wiki-article .thumb img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .wiki-article .infobox caption {
+            font-weight: 600;
+            padding: 0.6rem 0.9rem;
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.12), transparent);
+        }
+
+        .dark .wiki-article .infobox caption {
+            background: linear-gradient(to right, rgba(96, 165, 250, 0.18), transparent);
+        }
+
+        .wiki-article .infobox td,
+        .wiki-article .infobox th {
+            padding: 0.35rem 0.7rem;
+        }
+
+        /* Modern typography tweaks inside article body */
+        .wiki-article h2 {
+            margin-top: 2.25rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.5rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+            padding-bottom: 0.35rem;
+        }
+
+        .wiki-article h3 {
+            margin-top: 1.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .wiki-article p {
+            margin-top: 0.35rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .wiki-article a {
+            color: #2563eb;
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        .dark .wiki-article a {
+            color: #60a5fa;
+        }
+
+        .wiki-article a:hover {
+            color: #1d4ed8;
+        }
+
+        .dark .wiki-article a:hover {
+            color: #93c5fd;
+        }
+
+        .wiki-article ul,
+        .wiki-article ol {
+            margin-left: 1.5rem;
+        }
+
+        .wiki-article blockquote {
+            border-left: 3px solid rgba(37, 99, 235, 0.4);
+            padding-left: 1rem;
+            margin-left: 0;
+            font-style: italic;
+        }
+
+        @media (max-width: 1024px) {
+            .wiki-article .infobox,
+            .wiki-article .thumb {
+                float: none;
+                margin: 1rem auto;
+                max-width: min(20rem, 100%);
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-200 min-h-screen">
     <!-- Header will be injected by JavaScript -->
@@ -60,7 +172,7 @@
             </div>
 
             <!-- Article Body -->
-            <div id="articleContent" class="p-6 overflow-y-auto prose prose-lg dark:prose-invert max-w-none">
+            <div id="articleContent" class="p-6 overflow-y-auto prose prose-lg dark:prose-invert max-w-none wiki-article">
                 <!-- Article content will be inserted here -->
             </div>
         </div>
