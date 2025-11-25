@@ -263,12 +263,16 @@ class WikipediaAPI {
     }
 
     parseSearchResults(data) {
+        // MediaWiki opensearch returns: [ searchTerm, titles[], descriptions[], urls[] ]
         if (!Array.isArray(data) || data.length < 4) {
+            console.warn('Unexpected search response format', data);
             return [];
         }
 
-        const [titles, descriptions, urls] = [data[0], data[1], data[2]];
-        
+        const titles = Array.isArray(data[1]) ? data[1] : [];
+        const descriptions = Array.isArray(data[2]) ? data[2] : [];
+        const urls = Array.isArray(data[3]) ? data[3] : [];
+
         return titles.map((title, index) => ({
             title: title,
             description: descriptions[index] || '',
